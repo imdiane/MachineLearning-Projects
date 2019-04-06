@@ -1,0 +1,82 @@
+import pandas as pd
+import numpy as np
+import os
+import webbrowser
+from scipy.optimize import fmin_cg
+
+### Target Matrix Aggregation
+
+d1 = pd.read_csv('/Users/apple/Desktop/DataSets/CSE847Project/Rating_data/rating1.csv')
+df1 = pd.DataFrame(data = np.array(d1), columns = ['user_id', 'rate_score', 'movie_id'], index=None, dtype=None, copy=False)
+
+d2 = pd.read_csv('/Users/apple/Desktop/DataSets/CSE847Project/Rating_data/rating2.csv')
+df2 = pd.DataFrame(data = np.array(d2), columns = ['user_id', 'rate_score', 'movie_id'], index=None, dtype=None, copy=False)
+
+d3 = pd.read_csv('/Users/apple/Desktop/DataSets/CSE847Project/Rating_data/rating3.csv')
+df3 = pd.DataFrame(data = np.array(d3), columns = ['user_id', 'rate_score', 'movie_id'], index=None, dtype=None, copy=False)
+
+d4 = pd.read_csv('/Users/apple/Desktop/DataSets/CSE847Project/Rating_data/rating4.csv')
+df4 = pd.DataFrame(data = np.array(d4), columns = ['user_id', 'rate_score', 'movie_id'], index=None, dtype=None, copy=False)
+
+df = np.vstack((df1, df2, df3, df4))
+df = pd.DataFrame(data = np.array(df), columns = ['user_id', 'rate_score', 'movie_id'], index=None, dtype=None, copy=False)
+
+ratings_df = pd.pivot_table(df, index='user_id', columns='movie_id', aggfunc=np.max)
+
+html = ratings_df.to_html(na_rep="")
+
+with open("review_matrix.html", "w") as f:
+    f.write(html)
+
+full_filename = os.path.abspath("review_matrix.html")
+webbrowser.open("file://{}".format(full_filename))
+
+### Matrix Completion Using Matrix Factorization
+
+def low_rank_matrix_factorization(ratings, mask=None, num_features=15, regularization_amount=0.01):
+    """
+    Factor a ratings array into two latent feature arrays (user features and product features)
+
+    :param ratings: Matrix with user ratings to factor
+    :param mask: A binary mask of which ratings are present in the ratings array to factor
+    :param num_features: Number of latent features to generate for users and products
+    :param regularization_amount: How much regularization to apply
+    :return: (P, Q) - the factored latent feature arrays
+    """
+    num_users, num_products = ratings.shape
+
+    # If no mask is provided, consider all 'NaN' elements as missing and create a mask.
+    if mask is None:
+        mask = np.invert(np.isnan(ratings))
+
+    # Replace NaN values with zero
+    ratings = np.nan_to_num(ratings)
+
+    # Create P and Q and fill with random numbers to start
+    np.random.seed(0)
+    P = np.random.randn(num_users, num_features)
+    Q = np.random.randn(num_products, num_features)
+
+    # Roll up P and Q into a contiguous array as fmin_cg expects
+    initial = np.append(P.ravel(), Q.ravel())
+
+    # Create an args array as fmin_cg expects
+    args = (num_users, num_products, num_features, ratings, mask, regularization_amount)
+
+    # Call fmin_cg to minimize the cost function and this find the best values for P and Q
+    X = fmin_cg(cost, initial, fprime=gradient, args=args, maxiter=3000)
+
+    # Unroll the new P and new Q arrays out of the contiguous array returned by fmin_cg
+    nP = X[0:(num_users * num_features)].reshape(num_users, num_features)
+    nQ = X[(num_users * num_features):].reshape(num_products, num_features)
+
+    return nP, nQ.T
+    
+U, M = low_rank_matrix_factorization(ratings_df.as_matrix(), num_features=15, regularization_amount=0.1)
+    
+predicted_ratings = np.matmul(U, M)
+    
+predicted_ratings_df = pd.DataFrame(index=ratings_df.index, columns=ratings_df.columns, data=predicted_ratings)
+predicted_ratings_df.to_csv("predicted_ratings.csv")
+    
+predicted_ratings_df.head()
