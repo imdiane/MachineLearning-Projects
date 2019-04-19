@@ -21,10 +21,10 @@ df3 = pd.DataFrame(data = np.array(d3), columns = ['user_id', 'rate_score', 'mov
 d4 = pd.read_csv('/Users/apple/Desktop/DataSets/CSE847Project/Rating_data/rating4.csv')
 df4 = pd.DataFrame(data = np.array(d4), columns = ['user_id', 'rate_score', 'movie_id'], index=None, dtype=None, copy=False)
 
-df1_sample = df1.sample(n=1000)
-df2_sample = df2.sample(n=1000)
-df3_sample = df3.sample(n=1000)
-df4_sample = df4.sample(n=1000)
+df1_sample = df1.sample(n=3000)
+df2_sample = df2.sample(n=3000)
+df3_sample = df3.sample(n=3000)
+df4_sample = df4.sample(n=3000)
 
 df = np.vstack((df1_sample, df2_sample, df3_sample, df4_sample))
 df = pd.DataFrame(data = np.array(df), columns = ['user', 'rating', 'movie'], index=None, dtype=None, copy=False)
