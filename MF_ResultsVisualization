@@ -127,7 +127,7 @@ def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
 
 fig, ax = plt.subplots()
 
-im, cbar = heatmap(ratings_df, user, movie, ax=ax,
+im, cbar = heatmap(ratings_df, user_u, movie_u, ax=ax,
                    cmap="", cbarlabel="ratings")
 texts = annotate_heatmap(im, valfmt="{x:.1f} t")
 
@@ -137,13 +137,25 @@ plt.show()
 
 
 
-## Heat Map for Sparse Ratings Matrix
+## Heat Map for Sparse Ratings Matrix (Simple Realization)
 
 fig, ax = plt.subplots()
+im = ax.imshow(ratings_df)
 
-im, cbar = heatmap(predicted_ratings_df, user, movie, ax=ax,
-                   cmap="", cbarlabel="ratings")
-texts = annotate_heatmap(im, valfmt="{x:.1f} t")
+ax.set_xticks(np.arange(len(user_u)))
+ax.set_yticks(np.arange(len(movie_u)))
 
+ax.set_xticklabels(user_u)
+ax.set_yticklabels(movie_u)
+
+plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+         rotation_mode="anchor")
+
+for i in range(len(user_u)):
+    for j in range(len(movie_u)):
+        text = ax.text(j, i, ratings_df[i, j],
+                       ha="center", va="center", color="w")
+
+ax.set_title("Sparse Original Ratings Matrix")
 fig.tight_layout()
 plt.show()
