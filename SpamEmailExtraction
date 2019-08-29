@@ -1,10 +1,8 @@
-% Qn1. Logistic Regression - SpamEmail
-
-function Qn1
+Logistic Regression - SpamEmail
 
 % Load the dataset
-spamdata = importdata('/Users/apple/Desktop/DataSets/CSE847HW/HW4/Qn1/SpamEmail_Data.txt', ' ', 0);     
-spamlabels = importdata('/Users/apple/Desktop/DataSets/CSE847HW/HW4/Qn1/SpamEmail_Labels.txt', ' ', 0); 
+spamdata = importdata('SpamEmail_Data.txt', ' ', 0);     
+spamlabels = importdata('SpamEmail_Labels.txt', ' ', 0); 
 spamdata = [spamdata ones(4601,1)];                            
     
 % Seperate the data into train and test sets
