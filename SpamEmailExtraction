@@ -1,0 +1,98 @@
+% Qn1. Logistic Regression - SpamEmail
+
+function Qn1
+
+% Load the dataset
+spamdata = importdata('/Users/apple/Desktop/DataSets/CSE847HW/HW4/Qn1/SpamEmail_Data.txt', ' ', 0);     
+spamlabels = importdata('/Users/apple/Desktop/DataSets/CSE847HW/HW4/Qn1/SpamEmail_Labels.txt', ' ', 0); 
+spamdata = [spamdata ones(4601,1)];                            
+    
+% Seperate the data into train and test sets
+x_train = spamdata(1:2000,:);
+y_train = spamlabels(1:2000,:);
+x_test = spamdata(2001:end,:);
+y_test = spamlabels(2001:end,:);
+    
+% Initialize variables
+epsilon = 0;                             
+maxiter = 0; 
+n = [200 500 800 1000 1500 2000];
+accuracy = [];
+perf = [];
+    
+% Tune the model
+for i=1:length(n)
+    correct = 0;
+    n_xtrain = x_train(1:n(i),:);
+    n_ytrain = y_train(1:n(i),:);
+    
+    % Use the logistic_train function to gain the weights
+    weights = logistic_train(n_xtrain, n_ytrain, epsilon, maxiter); 
+    prediction = sigmf(x_test*weights, [1 0]);
+    [~,~,~,perf(i)] = perfcurve(y_test, prediction, 1);             
+    pred = round(prediction);
+    for j = 1:length(y_test)
+        if y_test(j) == pred(j)
+            correct = correct + 1;
+        end
+    end
+    
+    % Accuracy for each round
+    accuracy(i) = correct/length(y_test);
+    fprintf('n = %d\tAccuracy = %f\n', n(i), accuracy(i));
+end
+
+% Plot the results (Accuracy & AUC)
+figure;
+plot(n, accuracy);
+title('Accuracy Curve');
+figure;
+plot(n, perf);
+title('AUC Curve');
+end
+
+function [weights] = logistic_train(spamdata, spamlabels, epsilon, maxiter)
+%
+% code to train a logistic regression classifier
+% INPUTS:
+%   data    = n * (d+1) matrix with n samples and d features, where column
+%             d+1 is all ones (corresponding to the intercept term)
+%   labels  = n * 1 vector of class labels (taking values 0 or 1)
+%   epsilon = optional argument specifying the convergence criterion - if
+%             the change in the absolute difference in predictions, from one
+%             iteration to the next, averaged across input features, is less than
+%             epsilon, then half (if unspecified, use a default value of 1e-5)
+%   maxiter = optional argument that specifies the max number of iterations
+%             to execute. (If unspecified can be set to 1000)
+%
+% OUTPUT:
+%       weights = (d+1) * l vector of weights where the weights correspond
+%       to the columns of "data"
+    
+
+% Initialize variables & weights
+if ~maxiter
+    maxiter = 1000;
+end
+if ~epsilon
+    epsilon = 1e-5;
+end
+
+weights = zeros(58,1);
+N = length(spamdata);
+R = zeros(N,N);
+    
+% Learning by Gradient Descent
+for i = 1:maxiter
+    y = sigmf(spamdata*weights, [1 0]);
+    for n = 1:N
+        R(n,n) = y(n)*(1-y(n));
+    end
+    wLast = weights;
+    R = R + eye(N)*0.1;
+    
+    % Calculate gradient and Hessian matrix for cross-entropy error function
+    z = spamdata*wLast - inv(R)*(y-spamlabels);
+    weights = inv(transpose(spamdata)*R*spamdata)*transpose(spamdata)*R*z;
+end
+end
