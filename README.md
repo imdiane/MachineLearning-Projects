@@ -1,3 +1,3 @@
 ## Machine Learning (Project)
 
-This folder aims to the project of Machine Learning.
+This folder aims to the projects fielded in Machine Learning.
