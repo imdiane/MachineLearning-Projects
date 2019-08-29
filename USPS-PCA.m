@@ -1,7 +1,6 @@
-load ('/Users/apple/Desktop/DataSets/CSE847HW/HW5/USPS.mat');
+load ('/USPS.mat');
 
 % Apply PCA to the data using p = 10; 50; 100; 200.
-
 P=[10 50 100 200];
 nComp = length(P);
 
