@@ -4,9 +4,6 @@ import os
 import webbrowser
 from scipy.optimize import fmin_cg
 
-
-
-
 ### Target Matrix Aggregation
 
 d1 = pd.read_csv('/Users/apple/Desktop/DataSets/CSE847Project/Rating_data/rating1.csv')
