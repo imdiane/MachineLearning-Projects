@@ -1,9 +1,7 @@
-% Qn2. Sparse Logistic Regression - AlzheimerDisease
-
-function Qn2
+Sparse Logistic Regression - AlzheimerDisease
 
 % Load the dataset
-load('/Users/apple/Desktop/DataSets/CSE847HW/HW4/Qn2/ad_data.mat', 'X_train', 'y_train', 'X_test', 'y_test');
+load('ad_data.mat', 'X_train', 'y_train', 'X_test', 'y_test');
 
 % Initialize the parameters
 par = [0 0.01 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1];
@@ -32,12 +30,6 @@ figure;
 plot(par,perf);
 title('AUC Curve');
 end
-
-
-
-
-
-
 
 
 
